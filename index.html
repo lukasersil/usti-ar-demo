@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Co se děje v Ústí · ukázka AR</title>
+<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #16142c; font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; }
+  #hint { position: fixed; left: 50%; top: 18px; transform: translateX(-50%); z-index: 10000; padding: 10px 16px;
+          border-radius: 999px; background: rgba(22,20,44,.85); color: #fff; font-size: 15px; border: 2px solid #e879c8; }
+  #hint.hidden { display: none; }
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10000; display: flex; justify-content: space-between; align-items: center;
+         gap: 8px; padding: 10px 14px; background: rgba(22,20,44,.85); color: #ddd; font-size: 12px; }
+  #bar button { font-size: 14px; padding: 8px 12px; border-radius: 10px; border: 0; background: #f6c455; color: #16142c; font-weight: 700; }
+  #seznam { display: none; position: fixed; inset: 0; z-index: 10001; overflow: auto; background: #16142c; color: #fff; padding: 20px 18px 80px; }
+  #seznam.open { display: block; }
+  #seznam h1 { font-size: 22px; margin: 6px 0 14px; }
+  #seznam .k { border: 2px solid #e879c8; border-radius: 14px; padding: 12px 14px; margin: 10px 0; }
+  #seznam .k b { display: block; font-size: 18px; } #seznam .k span { color: #f096d7; font-weight: 700; } #seznam .k i { display: block; color: #ccc; font-style: normal; }
+  #seznam .zdroj { color: #aaa; font-size: 12px; margin-top: 16px; }
+</style>
+</head>
+<body>
+<div id="hint">Namiřte mobil na plakát</div>
+
+<a-scene mindar-image="imageTargetSrc: ./targets.mind; uiScanning: no; uiLoading: no; filterMinCF: 0.0001; filterBeta: 0.001"
+         color-space="sRGB" renderer="colorManagement: true" vr-mode-ui="enabled: false" xr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+  <a-assets>
+    <img id="k1" src="karty/akce-1.png"><img id="k2" src="karty/akce-2.png"><img id="k3" src="karty/akce-3.png">
+    <img id="k4" src="karty/akce-4.png"><img id="k5" src="karty/akce-5.png"><img id="k6" src="karty/akce-6.png">
+  </a-assets>
+  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+  <!-- cíl = plakát na šířku 1 jednotky, na výšku 1,5 (poměr 2:3), střed v počátku -->
+  <a-entity id="cil" mindar-image-target="targetIndex: 0">
+    <a-image src="#k1" width="0.62" height="0.223" position="-0.33 0.62 0.06" class="karta"></a-image>
+    <a-image src="#k2" width="0.62" height="0.223" position="0.33 0.62 0.06" class="karta"></a-image>
+    <a-image src="#k3" width="0.62" height="0.223" position="-0.33 0.37 0.06" class="karta"></a-image>
+    <a-image src="#k4" width="0.62" height="0.223" position="0.33 0.37 0.06" class="karta"></a-image>
+    <a-image src="#k5" width="0.62" height="0.223" position="-0.33 0.12 0.06" class="karta"></a-image>
+    <a-image src="#k6" width="0.62" height="0.223" position="0.33 0.12 0.06" class="karta"></a-image>
+  </a-entity>
+</a-scene>
+
+<div id="bar"><span>Program: usti.cz, 9. 11. 2026 · ukázka AR, lukasersil.com</span><button id="btn">Seznam akcí</button></div>
+
+<div id="seznam">
+  <h1>Ústecké Vánoce 2026</h1>
+  <div class="k"><b>Slavnostní zahájení</b><span>ne 29. 11. · 17:15</span><i>Lidické náměstí · rozsvícení stromu a koncert Pokáče</i></div>
+  <div class="k"><b>Vánoční trhy</b><span>29. 11.–23. 12. · denně 12–19</span><i>Lidické náměstí · program každý den kromě pondělí</i></div>
+  <div class="k"><b>Pohádka pro děti</b><span>každé úterý · 16:00</span><i>Lidické náměstí</i></div>
+  <div class="k"><b>Mikulášský program</b><span>so 5. 12.</span><i>Lidické náměstí</i></div>
+  <div class="k"><b>Česko zpívá koledy</b><span>st 9. 12.</span><i>Ústecké Vánoce</i></div>
+  <div class="k"><b>Kluziště a vyhlídkové kolo</b><span>29. 11.–23. 12.</span><i>kluziště na Větruši · kolo na Mírovém náměstí</i></div>
+  <p class="zdroj">Zdroj: usti.cz, „Ústecké Vánoce 2026 – advent v duchu naděje“, 9. 11. 2026. Ukázka rozšířené reality pro přednášku, není to oficiální stránka města.</p>
+  <button onclick="document.getElementById('seznam').classList.remove('open')">Zpět na kameru</button>
+</div>
+
+<script>
+  const hint = document.getElementById('hint');
+  const cil = document.getElementById('cil');
+  const karty = [...document.querySelectorAll('.karta')];
+  karty.forEach(k => k.setAttribute('scale', '0.001 0.001 0.001'));
+  cil.addEventListener('targetFound', () => {
+    hint.classList.add('hidden');
+    karty.forEach((k, i) => {
+      k.removeAttribute('animation');
+      k.setAttribute('animation', `property: scale; from: 0.001 0.001 0.001; to: 1 1 1; dur: 450; delay: ${i * 120}; easing: easeOutBack`);
+    });
+  });
+  cil.addEventListener('targetLost', () => {
+    hint.classList.remove('hidden');
+    karty.forEach(k => { k.removeAttribute('animation'); k.setAttribute('scale', '0.001 0.001 0.001'); });
+  });
+  document.getElementById('btn').addEventListener('click', () => document.getElementById('seznam').classList.add('open'));
+</script>
+</body>
+</html>
